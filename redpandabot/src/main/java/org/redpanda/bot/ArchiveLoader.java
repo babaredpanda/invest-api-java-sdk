@@ -20,9 +20,12 @@ public class ArchiveLoader {
     "ALRS", "CHMF", "TATN", "AFKS", "SNGS", "MOEX", "RNFT", "SIBN", "BANEP", "VKCO"
   };
   public static final int[] YEARS = {2023, 2024};
-  public static final File FOLDER = new File("C:/home/elisey/projects/tinkoff/history");
+  public static final File FOLDER = new File(new File(System.getProperty("user.dir")), "../history");
 
   public static void main(String[] args) throws IOException {
+    //noinspection ResultOfMethodCallIgnored
+    FOLDER.mkdirs();
+
     var sandboxApi = InvestApi.createSandbox(TOKEN);
     for (String ticker : TICKERS) {
       Share share = sandboxApi.getInstrumentsService().getShareByTickerSync(ticker, "TQBR");

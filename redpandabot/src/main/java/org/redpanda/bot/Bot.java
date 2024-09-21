@@ -7,11 +7,9 @@ import ru.tinkoff.piapi.core.InvestApi;
 import ru.tinkoff.piapi.core.exception.ApiRuntimeException;
 import ru.tinkoff.piapi.core.models.FuturePosition;
 import ru.tinkoff.piapi.core.models.Money;
-import ru.tinkoff.piapi.core.models.Quantity;
 import ru.tinkoff.piapi.core.models.SecurityPosition;
 import ru.tinkoff.piapi.core.stream.StreamProcessor;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -336,12 +334,8 @@ public class Bot {
 
     var lastPrice = api.getMarketDataService().getLastPricesSync(List.of(figi)).get(0).getPrice();
     var minPriceIncrement = api.getInstrumentsService().getInstrumentByFigiSync(figi).getMinPriceIncrement();
-    var price = Quantity.ofQuotation(lastPrice)
-      .subtract(
-        Quantity.ofQuotation(minPriceIncrement)
-          .mapValue(minPriceBigDecimal -> minPriceBigDecimal.multiply(BigDecimal.TEN.multiply(BigDecimal.TEN)))
-      )
-      .toQuotation();
+    var price = Quotation.newBuilder().setUnits(lastPrice.getUnits() - minPriceIncrement.getUnits() * 100)
+      .setNano(lastPrice.getNano() - minPriceIncrement.getNano() * 100).build();
 
     //Выставляем заявку на покупку по лимитной цене
     var orderId = api.getOrdersService()
