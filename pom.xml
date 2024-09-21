@@ -54,6 +54,7 @@
         <module>contract</module>
         <module>core</module>
         <module>example</module>
+        <module>redpandabot</module>
     </modules>
 
     <distributionManagement>
