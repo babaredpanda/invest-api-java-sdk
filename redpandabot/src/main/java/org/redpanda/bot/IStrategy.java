@@ -1,9 +1,11 @@
 package org.redpanda.bot;
 
+import java.util.List;
+
 public interface IStrategy {
-  Action startDay(StrategyResult result, HistoryDay day);
+  List<Action> startDay(StrategyResult result, HistoryDay day);
 
-  Action endDay(StrategyResult result);
+  List<Action> endDay(StrategyResult result, HistoryDay day);
 
-  Action processCandle(HistoryCandle candle, StrategyResult result);
+  List<Action> processCandle(HistoryCandle candle, StrategyResult result);
 }

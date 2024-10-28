@@ -16,35 +16,50 @@ public class StrategyTest {
       StrategyResult result = new StrategyResult(START_BALANCE);
 //      IStrategy strategy = new RandomStrategy();
 //      IStrategy strategy = new TrendStrategy();
-      IStrategy strategy = new SimpleStrategy();
+//      IStrategy strategy = new SimpleStrategy();
+      IStrategy strategy = new RsiCrossBothStrategy();
 
-      Action action;
+      List<Action> actions;
       List<HistoryDay> days = DataFormat.loadTickerData(ticker);
       System.out.println("\tData loaded");
-      for (HistoryDay day: days) {
-        action = strategy.startDay(result, day);
+      for (HistoryDay day : days) {
+        actions = strategy.startDay(result, day);
 
         List<HistoryCandle> candles = day.getCandles();
         int end = candles.size() - 30;
         for (int i = 0; i < candles.size(); i++) {
           HistoryCandle candle = candles.get(i);
-          switch (action) {
-            case BUY:
-              result.buy(candle);
-              break;
-            case SELL_END_DAY:
-              result.sellEndDay(candle);
-              break;
-            case SELL_STOP_LOSS:
-              result.sellStopLoss(candle);
-              break;
-            case SELL_TAKE_PROFIT:
-              result.sellTakeProfit(candle);
-              break;
+          for (Action action : actions) {
+            switch (action) {
+              case LONG_OPEN:
+                result.longOpen(candle);
+                break;
+              case LONG_CLOSE_END_DAY:
+                result.longCloseEndDay(candle);
+                break;
+              case LONG_STOP_LOSS:
+                result.longStopLoss(candle);
+                break;
+              case LONG_TAKE_PROFIT:
+                result.longTakeProfit(candle);
+                break;
+              case SHORT_OPEN:
+                result.shortOpen(candle);
+                break;
+              case SHORT_CLOSE_END_DAY:
+                result.shortCloseEndDay(candle);
+                break;
+              case SHORT_STOP_LOSS:
+                result.shortStopLoss(candle);
+                break;
+              case SHORT_TAKE_PROFIT:
+                result.shortTakeProfit(candle);
+                break;
+            }
           }
-          action = strategy.processCandle(candle, result);
+          actions = strategy.processCandle(candle, result);
           if (i == end) {
-            action = strategy.endDay(result);
+            actions = strategy.endDay(result, day);
           }
         }
         result.endDay(candles.get(candles.size() - 1));

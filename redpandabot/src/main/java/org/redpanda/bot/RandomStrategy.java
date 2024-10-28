@@ -1,35 +1,40 @@
 package org.redpanda.bot;
 
+import java.util.Collections;
+import java.util.List;
+
 public class RandomStrategy implements IStrategy {
   private boolean canBuy = false;
 
   @Override
-  public Action startDay(StrategyResult result, HistoryDay day) {
+  public List<Action> startDay(StrategyResult result, HistoryDay day) {
     canBuy = true;
-    return Action.NOTHING;
+    return Collections.emptyList();
   }
 
   @Override
-  public Action endDay(StrategyResult result) {
+  public List<Action> endDay(StrategyResult result, HistoryDay day) {
     canBuy = false;
-    return result.getLots() > 0 ? Action.SELL_END_DAY : Action.NOTHING;
+    return result.getLongLots() > 0
+      ? Collections.singletonList(Action.LONG_CLOSE_END_DAY)
+      : Collections.emptyList();
   }
 
   @Override
-  public Action processCandle(HistoryCandle candle, StrategyResult result) {
-    if (result.getLots() == 0) {
+  public List<Action> processCandle(HistoryCandle candle, StrategyResult result) {
+    if (result.getLongLots() == 0) {
       if (canBuy && Math.random() < 0.001) {
-        return Action.BUY;
+        return Collections.singletonList(Action.LONG_OPEN);
       }
     } else {
-      if (candle.getClose() / result.getDealPrice() <= 0.998) {
-        return Action.SELL_STOP_LOSS;
+      if (candle.getClose() / result.getLongDealPrice() <= 0.998) {
+        return Collections.singletonList(Action.LONG_STOP_LOSS);
       }
 
-      if (candle.getHigh() / result.getDealPrice() >= 1.01) {
-        return Action.SELL_TAKE_PROFIT;
+      if (candle.getHigh() / result.getLongDealPrice() >= 1.01) {
+        return Collections.singletonList(Action.LONG_TAKE_PROFIT);
       }
     }
-    return Action.NOTHING;
+    return Collections.emptyList();
   }
 }

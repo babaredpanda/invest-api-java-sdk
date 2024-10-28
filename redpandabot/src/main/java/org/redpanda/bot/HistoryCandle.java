@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Iterator;
 
-public class HistoryCandle {
+public class HistoryCandle implements ICandle {
   private final long ts;
   private final double open;
   private final double close;
@@ -61,26 +61,32 @@ public class HistoryCandle {
     );
   }
 
+  @Override
   public long getTimestamp() {
     return ts;
   }
 
+  @Override
   public double getOpen() {
     return open;
   }
 
+  @Override
   public double getClose() {
     return close;
   }
 
+  @Override
   public double getHigh() {
     return high;
   }
 
+  @Override
   public double getLow() {
     return low;
   }
 
+  @Override
   public int getVolume() {
     return volume;
   }
